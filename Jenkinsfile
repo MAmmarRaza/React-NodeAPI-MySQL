@@ -8,14 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    credentialsId: 'github-access',
-                    url: "${REPO_URL}"
-            }
-        }
-
         stage('Deploy to Server') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ammar-server', keyFileVariable: 'SSH_KEY')]) {
