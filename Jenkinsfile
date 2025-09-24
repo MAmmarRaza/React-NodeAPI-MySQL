@@ -16,16 +16,6 @@ pipeline {
             }
         }
 
-        stage('Install & Build') {
-            steps {
-                sh '''
-                echo "📦 Installing dependencies..."
-                npm install
-                echo "🏗️ Building React app..."
-                npm run build
-                '''
-            }
-        }
 
         stage('Deploy to Server') {
             steps {
