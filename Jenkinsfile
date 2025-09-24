@@ -8,18 +8,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout & Build') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-access',
                     url: "${REPO_URL}"
-                sh '''
-                echo "📦 Installing dependencies..."
-                cd frontend
-                npm install
-                echo "🏗️ Building React app..."
-                npm run build
-                '''
             }
         }
 
@@ -27,8 +20,16 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ammar-server', keyFileVariable: 'SSH_KEY')]) {
                     sh """
-                    echo "🚀 Copying build files to server..."
-                    scp -i $SSH_KEY -o StrictHostKeyChecking=no -r frontend/build/* ${DEPLOY_SERVER}:${APP_PATH}/build/
+                    echo "🚀 Deploying to server..."
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${DEPLOY_SERVER} '
+                        cd ${APP_PATH} &&
+                        echo "🔄 Pulling latest code..." &&
+                        git pull &&
+                        echo "📦 Installing dependencies..." &&
+                        npm install &&
+                        echo "🏗️ Building React app..." &&
+                        npm run build
+                    '
                     """
                 }
             }
